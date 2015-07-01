@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>i18n-msg element Demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../i18n-msg.html">
+  <link rel="import" href="../i18n-msg-domain/i18n-msg-domain.html">
+</head>
+<body>
+
+<!-- Provides the 'default' domain in english -->
+<i18n-msg-domain id="i18nDomain"
+  messages-url="locales">
+</i18n-msg-domain>
+
+<!-- Provides the 'demo-domain' domain in german -->
+<i18n-msg-domain id="demoDomain"
+  domain="demo-domain"
+  locale="de"
+  messages-url="locales">
+</i18n-msg-domain>
+
+<div>
+  <label for="">Choose language for default domain</label>
+  <select id="langSelector">
+    <option selected>en</option>
+    <option>es</option>
+    <option>fr</option>
+  </select>
+</div>
+
+<div>
+  <label for="">Choose language for 'demo-domain' domain</label>
+  <select id="langSelectorDomain">
+    <option selected>en</option>
+    <option>de</option>
+  </select>
+</div>
+
+<p style="margin-top: 50px;">Locale domain: <strong>default</strong></p>
+<i18n-msg msgid="welcome">This is some placeholder text. It's msgid is 'welcome'.</i18n-msg>
+
+<p style="margin-top: 50px;">Locale domain: <strong>demo-domain</strong></p>
+<i18n-msg domain="demo-domain" msgid="special">The special text will appear here...</i18n-msg>
+
+<script>
+  var i18nDomain = document.querySelector('#i18nDomain');
+  var demoDomain = document.querySelector('#demoDomain');
+  var langSelector = document.querySelector('#langSelector');
+  var langSelectorDemo = document.querySelector('#langSelectorDomain');
+
+  langSelector.addEventListener('change', function() {
+    i18nDomain.locale = this.value;
+  });
+
+  langSelectorDemo.addEventListener('change', function() {
+    demoDomain.locale = this.value;
+  });
+</script>
+</body>
+</html>

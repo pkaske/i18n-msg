@@ -1,0 +1,190 @@
+<!--
+@license
+Copyright (c) 2015 Peter Kaske <p.kaske@gmail.com>. All rights reserved.
+This code may only be used under the MIT license found at http://opensource.org/licenses/MIT.
+Or see the LICENSE file that comes with this code.
+-->
+
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+<!--
+A component to fetch and serve translation text for a specific text domain.
+
+Example
+
+    <i18n-msg-domain
+      url="locales"
+      locale="de">
+    </i18n-msg-domain>
+
+    <i18n-msg-domain
+      domain="another-domain"
+      url="locales"
+      locale="fr">
+    </i18n-msg-domain>
+
+    <i18n-msg msgid="bar">FALLBACK TEXT</i18n-msg>
+    <i18n-msg domain="another-domain" msgid="hello">HELLO IN FRENCH</i18n-msg>
+
+@group GUI Elements
+@element i18n-msg-domain
+@demo demo/index.html
+@homepage http://pkaske.github.io/i18n-msg-domain
+-->
+<dom-module id="i18n-msg-domain">
+  <template>
+    <iron-ajax id="ajax"
+      url="{{messagesUrl}}"
+      handle-as="json"
+      on-response="_handleResponse"></iron-ajax>
+  </template>
+</dom-module>
+<script>
+  (function () {
+
+    window.I18nMsg = window.I18nMsg || {
+      // The default domain is named 'default'
+      domains: {
+        'default': {
+          locales: {},
+          instances: []   // Target `i18n-msg` elements for easy update
+        }
+      }
+    };
+
+    Polymer({
+      is: 'i18n-msg-domain',
+
+      /**
+       * The `i18n-locale-ready` is fired after the locale was fetched and all `<i18n-msg>` elements were updated.
+       *
+       * @event i18n-locale-ready
+       * @detail {{locale: String}}
+       */
+
+      properties: {
+        /**
+         * The domain the elements serves.
+         */
+        domain: {
+          type: String,
+          value: 'default'
+        },
+
+        /**
+         * The default locale being used.
+         */
+        locale: {
+          type: String,
+          value: 'en',
+          observer: '_localeChanged'
+        },
+
+        /**
+         * The folder name where the localized `<lang>.json` files are located.
+         * Overrides `window.I18nMsg` if not `null`.
+         */
+        messagesUrl: {
+          type: String,
+          value: 'lang',
+          observer: '_messagesUrlChanged'
+        }
+      },
+
+      domains: window.I18nMsg.domains,
+
+      /**
+       * Returns a message in the chosen locale and domain.
+       * @method getMsg
+       * @param {string=} opt_msgId Optional message id to lookup. If left off,
+       * the instance's `msgid` property is used.
+       * @return {string|null} Translated message or `null` if not found.
+       */
+      getMsg: function(msgId, locale, domain) {
+        domain = domain || this.domain;
+        locale = locale || this.locale;
+
+        if (!this.domains[domain] || !this.domains[domain].locales[locale]) {
+          return null;
+        }
+
+        var lang = this.domains[domain].locales[locale];
+        if (lang && lang[msgId]) {
+          return lang[msgId].message;
+        }
+        return null;
+      },
+
+      getLocale: function(locale, domain) {
+        domain = domain || this.domain;
+        locale = locale || this.locale;
+
+        if (!this.domains[domain] || !this.domains[domain].locales[locale]) {
+          return null;
+        }
+
+        var lang = this.domains[domain].locales[locale];
+        if (lang) {
+          return lang;
+        }
+        return null;
+      },
+
+      _messagesUrlChanged: function() {
+        this.async(function() {
+          this._fetchLocale(this.locale);
+        });
+      },
+
+      _localeChanged: function(newLocale, oldLocale) {
+        if (this.getLocale(newLocale) != null) {
+          this._updateInstances(newLocale);
+          return;
+        }
+
+        if (oldLocale) {  // Don't fetch on the first change. The messagesUrl change does that already.
+          this.async(function() {
+            this._fetchLocale(newLocale);
+          });
+        }
+      },
+
+      _fetchLocale: function(locale) {
+        if (this.getLocale(locale) != null) {
+          return; // Don't fetch if the locale is already defined in the global object.
+        }
+
+        // Initiate or get the domain object
+        var domainObj = this.domains[this.domain] || {
+          locales: {},
+          instances: []
+        };
+
+        // Set the locale we're about to fetch. This prevents duplicate requests by other `i18n-msg-domain` elements.
+        domainObj.locales[locale] = {};
+        this.domains[this.domain] = domainObj;
+
+        var domain = this.domain != 'default' ? this.domain + '-' : '';
+        var url = this.messagesUrl + '/' + domain + locale + '.json';
+        this.$.ajax.url = url;
+        var request = this.$.ajax.generateRequest();
+        request.locale = locale;
+      },
+
+      _handleResponse: function(response) {
+        var locale = response.detail.locale;
+        this.domains[this.domain].locales[locale] = response.detail.response;
+        this._updateInstances(locale);
+
+        this.fire('i18n-msg-locale-ready', { 'domain': this.domain, 'locale': locale });
+      },
+
+      _updateInstances: function(locale) {
+        var instances = this.domains[this.domain].instances;
+        for (var i = 0, instance; instance = instances[i]; ++i) {
+          instance.update(locale);
+        }
+      }
+    });
+  })();
+</script>
