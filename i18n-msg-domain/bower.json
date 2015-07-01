@@ -1,0 +1,32 @@
+{
+  "name": "i18n-msg-domain",
+  "version": "1.0.0",
+  "authors": [
+    "Peter Kaske <p.kaske@gmail.com>"
+  ],
+  "description": "Serves translation files for the i18n-msg element.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "i18n",
+    "i10n",
+    "localization",
+    "internationalization"
+  ],
+  "main": "i18n-msg-domain.html",
+  "license": "MIT",
+  "homepage": "https://github.com/pkaske/i18n-msg-domain/",
+  "ignore": [
+    "/.*",
+    "/tests/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.0.2"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "Polymer/web-component-tester#master"
+  }
+}
