@@ -1,5 +1,4 @@
 <!doctype html>
-<!-- Copyright Eric Bidelman <ebidel@gmail.com> -->
 <html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
@@ -7,51 +6,58 @@
 
   <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="../i18n-msg.html">
-
+  <link rel="import" href="../i18n-msg-domain/i18n-msg-domain.html">
 </head>
 <body>
 
-<p>"Days" in selected language is: <b><i18n-msg id="daysMsgEl" msgid="days">PLACEHOLDER_STRING</i18n-msg></b>!</p>
-<p>"Hours" in selected language is: <b><i18n-msg msgid="hours">PLACEHOLDER_STRING</i18n-msg></b>!</p>
-<p>"Minutes" in selected language is: <b><i18n-msg msgid="minutes">PLACEHOLDER_STRING</i18n-msg></b>!</p>
+<!-- Provides the 'default' domain in english -->
+<i18n-msg-domain id="i18nDomain"
+  messages-url="locales">
+</i18n-msg-domain>
 
-<p>Example fallback text when a message id isn't found: <i18n-msg msgid="UNKNOWN_MSG_ID">PLACEHOLDER_STRING</i18n-msg></b></p>
+<!-- Provides the 'demo-domain' domain in german -->
+<i18n-msg-domain id="demoDomain"
+  domain="demo-domain"
+  locale="de"
+  messages-url="locales">
+</i18n-msg-domain>
 
-<select id="selector">
-  <option selected>en</option>
-  <option>es</option>
-  <option>fr</option>
-  <option>pt-br</option>
-</select>
+<div>
+  <label for="">Choose language for default domain</label>
+  <select id="langSelector">
+    <option selected>en</option>
+    <option>es</option>
+    <option>fr</option>
+  </select>
+</div>
 
-<p>Example of updating an attribute: <input id="input" placeholder="Days"></p>
+<div>
+  <label for="">Choose language for 'demo-domain' domain</label>
+  <select id="langSelectorDomain">
+    <option selected>en</option>
+    <option>de</option>
+  </select>
+</div>
+
+<p style="margin-top: 50px;">Locale domain: <strong>default</strong></p>
+<i18n-msg msgid="welcome">This is some placeholder text. It's msgid is 'welcome'.</i18n-msg>
+
+<p style="margin-top: 50px;">Locale domain: <strong>demo-domain</strong></p>
+<i18n-msg domain="demo-domain" msgid="special">The special text will appear here...</i18n-msg>
 
 <script>
-  var selector = document.querySelector('#selector');
-  var input = document.querySelector('#input');
+  var i18nDomain = document.querySelector('#i18nDomain');
+  var demoDomain = document.querySelector('#demoDomain');
+  var langSelector = document.querySelector('#langSelector');
+  var langSelectorDemo = document.querySelector('#langSelectorDomain');
 
-  // Event is only needed when running under the HTMLImports polyfill.
-  document.addEventListener('HTMLImportsLoaded', function() {
-    I18nMsg.lang = selector.value || document.documentElement.lang || 'en';
+  langSelector.addEventListener('change', function() {
+    i18nDomain.locale = this.value;
   });
 
-  selector.addEventListener('change', function() {
-    document.documentElement.lang = this.value;
-    I18nMsg.lang = this.value;
+  langSelectorDemo.addEventListener('change', function() {
+    demoDomain.locale = this.value;
   });
-
-  document.addEventListener('i18n-language-ready', function(e) {
-    var daysMsgEl = document.querySelector('#daysMsgEl');
-    input.placeholder = daysMsgEl.getMsg(daysMsgEl.msgid);
-  });
-</script>
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
- (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
- m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
- })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
- ga('create', 'UA-43475701-1', 'ebidel.github.io');
- ga('send', 'pageview');
 </script>
 </body>
 </html>

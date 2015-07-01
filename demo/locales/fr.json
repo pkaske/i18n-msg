@@ -1,14 +1,6 @@
 {
-  "days": {
-    "description": "...",
-    "message": "journées"
-  },
-  "hours": {
-    "description": "...",
-    "message": "heures"
-  },
-  "minutes": {
-    "description": "...",
-    "message": "minutes"
+  "welcome": {
+    "description": "The welcome text on the demo page",
+    "message": "Bienvenue à cette démo !<br><a href=\"#\" onclick=\"alert('bad stuff is going to happen...');\">s'amuser!</a>"
   }
 }
